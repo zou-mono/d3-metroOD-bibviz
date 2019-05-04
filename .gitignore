@@ -52,7 +52,5 @@ fabric.properties
 *.ear
 *.class
 
-/data
-
 *.exe
 *.bak
