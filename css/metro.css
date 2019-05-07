@@ -23,13 +23,13 @@ body {
 
 rect {
     stroke: none;
-    fill: steelblue;
+    /*fill: steelblue;*/
     transition: fill 0.3s;
 }
 
-rect:nth-child(even) {
-    fill: #3F75A2;
-}
+/*rect:nth-child(even) {*/
+    /*fill: #3F75A2;*/
+/*}*/
 
 rect:hover {
     cursor: pointer;
