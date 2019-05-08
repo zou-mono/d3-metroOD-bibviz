@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/bibviz1.iml" filepath="$PROJECT_DIR$/.idea/bibviz1.iml" />
       <module fileurl="file://$PROJECT_DIR$/tools/cal.iml" filepath="$PROJECT_DIR$/tools/cal.iml" />
+      <module fileurl="file://$PROJECT_DIR$/tools/tools.iml" filepath="$PROJECT_DIR$/tools/tools.iml" />
     </modules>
   </component>
 </project>

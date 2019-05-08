@@ -13,6 +13,8 @@
 .idea/dynamic.xml
 .idea/uiDesigner.xml
 .idea/vcs.xml
+.idea/modules.xml
+.idea/misc.xml
 
 # Gradle:
 .idea/gradle.xml
@@ -56,4 +58,7 @@ fabric.properties
 *.exe
 *.bak
 
-tools/cal.iml
+/venv
+.DS_Store
+
+tools/tools.iml
