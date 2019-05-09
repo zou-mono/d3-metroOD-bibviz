@@ -63,9 +63,14 @@ for f in from_station:
             icount+=1
             print(icount)
             # jr[f][res[1]]= res[2]
-            jr[f].append({
-                res[1]: res[2]
-            })
+            if res[2] > 3000:
+                jr[f].append({
+                    res[1]: res[2]
+                })
+
+# with open('res.csv','w',encoding='gbk') as f:
+#     json.dump(jr, f, ensure_ascii=False)
+
 
 # 把字典转成列表
 arr = []
@@ -75,7 +80,7 @@ for k,v in jr.items():
         'LINK': v
     })
 
-with open('res.json','w',encoding='utf_8') as f:
+with open('res_f.json','w',encoding='utf_8') as f:
     json.dump(arr, f, ensure_ascii=False)
 
 print("转换完成！")

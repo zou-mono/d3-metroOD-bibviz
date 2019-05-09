@@ -38,8 +38,9 @@ rect:hover {
 }
 
 .arc path {
-    stroke: crimson;
-    stroke-width: 1;
+    stroke: #0A84AE;
+    stroke-width: 1px;
+    stroke-opacity: 75%;
     fill: none;
 }
 

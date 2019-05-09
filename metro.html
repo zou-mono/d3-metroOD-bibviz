@@ -16,8 +16,8 @@
 <script>
     var station_array = [];
     var chart_width = 5; //站点chart的宽度
-    var chart_span = 5; //chart之间的间隔
-    var chart_init = 50;
+    var chart_span = 1; //chart之间的间隔
+    var chart_init = 0;
     var station_color = {
         1: "#006400",
         2: "#FF9000",
@@ -45,17 +45,14 @@
     //     return r;
     // }
 
-    function getChartPostion() {
-
-    }
-
     d3.select('#selected').transition().delay(1000).duration(1000).style('opacity', 1.0);
 
     d3.csv('data/station_flow.csv').then(function (data) {
         var station_flow = data;
 
         for (let i = 0; i < data.length; i++) {
-            if (station_array.indexOf(data[i].ZDMC) === -1) station_array.push(data[i].ZDMC);
+            // if (station_array.indexOf(data[i].ZDMC) === -1) station_array.push(data[i].ZDMC);
+            station_array.push(data[i].ZDMC);
         }
 
         var svg = d3.select('#station-chart');
@@ -81,83 +78,44 @@
                         '<br/> 全天出站客流量' + d.OUT_FLOW);
             });
 
-        d3.json('data/OD.json').then(function (json) {
-            // console.log(json);
-            var OD = json;
-            //
+        d3.json('data/res_f.json').then(function (json) {
+
             d3.select('#station-chart').selectAll('g')
                 .data(json)
                 .enter().append('g')
                 .attr('class', 'arc')
-                .each(function (d, i) {
-                    // console.log(Object.keys(d)[0]);
-                    let start = station_flow.findIndex(element => element.ZDMC === d.ZDMC);
-                    // console.log(start);
-                    // console.log(d.LINK);
-                    // console.log(d);
-                    let links = d.LINK;
-                    var icount = 0;
-                    for (var index = 0; index < links.length; index++) {
-                        // console.log(d.LINK[index]);
-                        // console.log(index);
-                        let link = links[index];
-                        // console.log(Object.keys(link)[0]);
-                        let end = station_flow.findIndex(element => element.ZDMC === Object.keys(link)[0]);
+                .each(function (d) {
+                    var startArr = station_flow.filter(element => element.ZDMC === d.ZDMC); //由于有换乘站，因此有可能会找到多个匹配站点
+                    // let start = station_flow.findIndex(element => element.ZDMC === d.ZDMC);
+                    var links = d.LINK;
 
-                        // if (start > end) {
-                        //     var tmp = end;
-                        //     end = start;
-                        //     start = tmp;
-                        // }
+                    for (let a = 0; a < links.length; a++) {
+                        let link = links[a];
+                        // let end = station_flow.findIndex(element => element.ZDMC === Object.keys(link)[0]);
+                        let endArr = station_flow.filter(element => element.ZDMC === Object.keys(link)[0]);
 
-                        let t = 0;
-                        let newStart=0;
-                        let newEnd=0;
-                        if (start > end) {
-                            t = start - end;
-                            newStart=end;
-                            newEnd=start;
-                        } else {
-                            t = end - start;
-                            newEnd=end;
-                            newStart=start;
+                        let start = 0;
+                        let end = 0;
+                        for (let i = 0; i < startArr.length; i++) {
+                            start = parseInt(startArr[i].NO);
+                            for (let j = 0; j < endArr.length; j++) {
+                                end = parseInt(endArr[j].NO);
+
+                                var r = (end - start) * (chart_width + chart_span) * 0.5;
+                                r = r > 0 ? r : -r;
+                                var ry = Math.min(r, 380);
+                                let startPos = (start > end) ? (end * (chart_width + chart_span)) : (start * (chart_width + chart_span));
+                                let endPos = (start < end) ? (end * (chart_width + chart_span)) : (start * (chart_width + chart_span));
+
+                                var path = 'M ' + startPos + ',399 A ' + r + ',' + ry + ' 0 0,1 ' + endPos + ',399 ';
+                                d3.select(this).append('path')
+                                    .attr('d', path)
+                            }
                         }
-
-                        var r = t * (chart_width + chart_span) * 0.5;
-                        // console.log(r);
-                        var ry = Math.min(r, 490);
-
-                        var path = 'M ' + (newStart * (chart_width+chart_span) + chart_init) + ',399 A ' + r + ',' + ry + ' 0 0,1 ' + (newEnd * (chart_width+chart_span) + chart_init) + ',399 ';
-                        d3.select(this).append('path')
-                            .attr('d', path)
-                            .style('stroke', 'white');
-                        // console.log(end);
-                        // console.log(icount++);
                     }
-
                 })
         });
-
-        console.log('enter');
     });
-
-    // var theData = [1,2,3];
-    // d3.select('#station-chart').selectAll('g')
-    //     .data(theData)
-    //     .enter().append('g')
-    //     .text("hello")
-
-    // d3.json('data/OD.json').then(function (json) {
-    //     console.log(json);
-    //     d3.select('#station-chart').selectAll('g')
-    //         .data(json)
-    //         .enter().append('g')
-    //         .text("hello")
-    //     // .attr('class', 'arc')
-    //     // .each(function(d,i){
-    //     //     console.log(d)
-    //     // })
-    // });
 </script>
 </body>
 </html>
