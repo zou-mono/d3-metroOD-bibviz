@@ -1,3 +1,7 @@
+###########################################
+# 这个工具用来合并一对单向流量,形成站点之间的总OD流量
+###########################################
+
 import csv,json
 
 data = []
@@ -43,30 +47,35 @@ icount=0
 #                 print(icount)
 #                 w.writerow(res)
 jr = {}
-for f in from_station:
-    jr[f] = []
+with open('res_csv.csv','w',encoding='utf_8',newline='') as csvout:
+    w = csv.writer(csvout)
+    w.writerow(['FROM_STATION','TO_STATION','FLOW'])
 
-    for t in to_station:
-        l = [x for x in data if
-             (x['fstation'] == f and x['tstation'] == t) or
-             (x['fstation'] == t and x['tstation'] == f)]
+    for f in from_station:
+        jr[f] = []
 
-        if len(l) == 2:
-            res = [f,t,int(l[0]['value'])+int(l[1]['value'])]
-            data.remove(l[1])
-            data.remove(l[0])
-        elif len(l) == 1:
-            res = [f,t,int(l[0]['value'])]
-            data.remove(l[0])
+        for t in to_station:
+            l = [x for x in data if
+                 (x['fstation'] == f and x['tstation'] == t) or
+                 (x['fstation'] == t and x['tstation'] == f)]
 
-        if len(l) > 0:
-            icount+=1
-            print(icount)
-            # jr[f][res[1]]= res[2]
-            if res[2] > 3000:
+            if len(l) == 2:
+                res = [f,t,int(l[0]['value'])+int(l[1]['value'])]
+                data.remove(l[1])
+                data.remove(l[0])
+            elif len(l) == 1:
+                res = [f,t,int(l[0]['value'])]
+                data.remove(l[0])
+
+            if len(l) > 0:
+                icount+=1
+                print(icount)
+                # jr[f][res[1]]= res[2]
+                # if res[2] > 3000:
                 jr[f].append({
                     res[1]: res[2]
                 })
+                w.writerow(res)
 
 # with open('res.csv','w',encoding='gbk') as f:
 #     json.dump(jr, f, ensure_ascii=False)
