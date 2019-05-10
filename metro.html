@@ -57,59 +57,20 @@
         return OD;
     }
 
-    //把所有的link归集到一个数组里
-    function jsonToArr(json) {
-        for (let i = 0; i < json.length; i++) {
-            json[i]
-        }
+
+    function svgParabola(start, end, v) {
+        let r = (end - start) * (chart_width + chart_span) * 0.5;
+        r = r > 0 ? r : -r;
+        let ry = Math.min(v, arc_max_height);
+        let modify =chart_width / 2;
+        let startPos = (start > end) ? (end * (chart_width + chart_span) + modify) : (start * (chart_width + chart_span) + modify);
+        let endPos = (start < end) ? (end * (chart_width + chart_span)-modify) : (start * (chart_width + chart_span)-modify);
+
+        return 'M ' + startPos + ',399 A ' + r + ',' + ry + ' 0 0,1 ' + endPos + ',399 ';
     }
 
-    //绘制弧线
-    function drawArc(station_flow) {
-        d3.json('data/OD_flow.json').then(function (json) {
-            let ODArr = filterOD(json);
-
-            d3.select('#station-chart').selectAll('g')
-                .data(ODArr)
-                .enter().append('g')
-                .attr('class', 'arc')
-                .each(function (d) {
-                    let startArr = station_flow.filter(element => element.ZDMC === d.ZDMC); //由于有换乘站，因此有可能会找到多个匹配站点
-                    let links = d.LINK;
-
-                    for (let a = 0; a < links.length; a++) {
-                        let link = links[a];
-                        let endArr = station_flow.filter(element => element.ZDMC === Object.keys(link)[0]);
-
-                        let start = 0;
-                        let end = 0;
-                        for (let i = 0; i < startArr.length; i++) {
-                            start = parseInt(startArr[i].NO);
-                            for (let j = 0; j < endArr.length; j++) {
-                                end = parseInt(endArr[j].NO);
-
-                                // var yScale = d3.scaleLinear().domain([minFLOW, maxFLOW]).range([0, arc_max_height]);
-
-                                let r = (end - start) * (chart_width + chart_span) * 0.5;
-                                r = r > 0 ? r : -r;
-                                let ry = Math.min(r, arc_max_height);
-                                let startPos = (start > end) ? (end * (chart_width + chart_span)) : (start * (chart_width + chart_span));
-                                let endPos = (start < end) ? (end * (chart_width + chart_span)) : (start * (chart_width + chart_span));
-
-                                let path = 'M ' + startPos + ',399 A ' + r + ',' + ry + ' 0 0,1 ' + endPos + ',399 ';
-                                d3.select(this).append('path')
-                                    .attr('d', path)
-                            }
-                        }
-                    }
-                });
-        });
-    }
-
-    //绘制抛物线
-    function drawParabola(station_flow) {
-        d3.csv('data/OD_flow.csv').then(function (data) {
-            // let ODArr = filterOD(data);
+    //绘制所有的OD弧线
+    function drawTotalArc(station_flow, data) {
             var maxFLOW = d3.max(data, d => parseInt(d.FLOW));
             var minFLOW = d3.min(data, d => parseInt(d.FLOW));
 
@@ -130,19 +91,13 @@
 
                             var yScale = d3.scaleLinear().domain([minFLOW, maxFLOW]).range([0, arc_max_height]);
 
-                            let r = (end - start) * (chart_width + chart_span) * 0.5;
-                            r = r > 0 ? r : -r;
-                            let ry = Math.min(yScale(d.FLOW), arc_max_height);
-                            let startPos = (start > end) ? (end * (chart_width + chart_span)) : (start * (chart_width + chart_span));
-                            let endPos = (start < end) ? (end * (chart_width + chart_span)) : (start * (chart_width + chart_span));
+                            let path = svgParabola(start, end, yScale(d.FLOW));
 
-                            let path = 'M ' + startPos + ',399 A ' + r + ',' + ry + ' 0 0,1 ' + endPos + ',399 ';
                             d3.select(this).append('path')
                                 .attr('d', path)
                         }
                     }
                 });
-        });
     }
 
     d3.select('#selected').transition().delay(1000).duration(1000).style('opacity', 1.0);
@@ -178,10 +133,28 @@
                         '<br/> 全天出站客流量' + d.OUT_FLOW);
             });
 
-        // drawArc(station_flow);
-        drawParabola(station_flow);
-    });
+        d3.csv('data/OD_flow.csv').then(function (d) {
+            d = d.filter(element => element.FLOW > 3000);
+            drawTotalArc(station_flow, d);
+        });
 
+        d3.selectAll('rect').on('click', function (d) {
+            d3.selectAll('.arc').remove();
+
+            d3.json('data/OD_flow.json').then(function (json) {
+                let stationArr=[];
+                let DArr = json.filter(element=> element.ZDMC === d.ZDMC)[0].LINK;
+                for(let i=0;i < DArr.length;i++){
+                    stationArr.push({
+                        FROM_STATION: d.ZDMC,
+                        TO_STATION: Object.keys(DArr[i])[0],
+                        FLOW: parseInt(DArr[i][Object.keys(DArr[i])[0]])
+                    })
+                }
+                drawTotalArc(station_flow, stationArr);
+            });
+        })
+    });
 </script>
 </body>
 </html>
