@@ -7,6 +7,28 @@ import csv,json
 data = []
 from_station=[]
 
+arr = [5,5,4,8,7,5,5,7,6,4]
+r=[]
+i = 0
+while i < len(arr):
+    j = i + 1
+    while j < len(arr):
+        if arr[i] == arr[j]:
+            i += 1
+            j = i
+            # j = i + 1
+        j+=1
+    r.append(arr[i])
+    i+=1
+
+# for i in range(0, len(arr)):
+#     for j in range(i + 1,len(arr)):
+#         if arr[i] == arr[j]:
+#             i += 1
+#             j = i
+#     r.append(arr[i])
+
+
 with open('../data/OD.csv','r',encoding='utf_8') as csvfile:
     raw = csv.reader(csvfile)
     next(csvfile)

@@ -35,16 +35,22 @@
     // }
 
     // 去除重复元素
-    // function uniqueArray(arr) {
-    //     let r = [];
-    //     if (!arr) return r;
-    //     for (let i = 0, l = arr.length; i < l; i++) {
-    //         for (let j = i + 1; j < l; j++)
-    //             if (arr[i] === arr[j]) j = ++i;
-    //         r.push(arr[i]);
-    //     }
-    //     return r;
-    // }
+    function uniqueArray(arr) {
+        let r = [];
+        if (!arr) return r;
+        for (let i = 0, l = arr.length; i < l; i++) {
+            for (let j = i + 1; j < l; j++) {
+                if (arr[i] === arr[j])
+                    j = ++i;
+            }
+            r.push(arr[i]);
+        }
+        return r;
+    }
+
+    var test=[5,5,4,8,7,5,5,7,6,4];
+    var resss = uniqueArray(test);
+
     function filterOD(json) {
         let OD = [];
         for (let i = 0; i < json.length; i++) {
@@ -90,9 +96,7 @@
                             end = parseInt(endArr[j].NO);
 
                             var yScale = d3.scaleLinear().domain([minFLOW, maxFLOW]).range([0, arc_max_height]);
-
                             let path = svgParabola(start, end, yScale(d.FLOW));
-
                             d3.select(this).append('path')
                                 .attr('d', path)
                         }
